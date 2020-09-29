@@ -1,0 +1,81 @@
+import React, { Component } from 'react';
+import { Form, Button, Alert } from 'react-bootstrap';
+import { login } from '../services/auth';
+
+class Login extends Component {
+
+  state = {
+    username: '',
+    password: '',
+    message: ''
+  }
+
+  handleSubmit = e => {
+    e.preventDefault();
+
+    const { username, password } = this.state;
+    login(username,password)
+      .then(data => {
+        if(data.message) {
+          this.setState({ 
+            message: data.message, 
+            username: '',
+            password: ''
+          });
+        } else {
+          this.props.setUser({
+            username: data.username, 
+            password: data.password,
+          });
+
+          this.props.history.push('/projects');
+        }
+      });
+
+  }
+
+  handleChange = e => {
+    const { name, value } = e.target;
+
+    this.setState({
+      [name]: value
+    })
+  }
+
+  render() {
+    return (
+      <div>
+        <h2>Login</h2>
+        <Form onSubmit={this.handleSubmit}>
+          <Form.Group>
+            <Form.Label htmlFor='username'>Username</Form.Label>
+            <Form.Control 
+              type='text'
+              name='username'
+              value={this.state.username} 
+              onChange={this.handleChange}
+              id='username'
+            />
+          </Form.Group>
+
+          <Form.Group>
+            <Form.Label htmlFor='password'>Password</Form.Label>
+            <Form.Control 
+              type='password'
+              name='password'
+              value={this.state.password} 
+              onChange={this.handleChange}
+              id='password'
+            />
+          </Form.Group>
+          {this.state.message && (
+            <Alert variant='danger'>{this.state.message}</Alert>
+          )}
+          <Button type='submit'>Login</Button>
+        </Form>
+      </div>
+    );
+  }
+}
+
+export default Login;
